@@ -1,0 +1,21 @@
+:host {
+  border: 1px solid black;
+  width: 100%;
+  text-align: center;
+}
+
+p {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  height: 50px;
+}
+
+.dead {
+  background-color: white;
+}
+
+.alive {
+  background-color: black;
+  color: white;
+}
