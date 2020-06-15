@@ -1,5 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {CellStatus} from './utils/types/cell-status.type';
+import {interval, Observable} from 'rxjs';
+import {map, startWith, switchMap, takeUntil, takeWhile, tap} from 'rxjs/operators';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+
+type Grid = CellStatus[][];
 
 @Component({
   selector: 'app-root',
@@ -7,37 +12,72 @@ import {CellStatus} from './utils/types/cell-status.type';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  public gridSize = 25;
-  grid: CellStatus[][];
 
-  public ngOnInit() {
-    this.init();
+  private form: FormGroup;
+
+  public gridSize = 25;
+  public generation = 0;
+  public pause = false;
+  private grid: Grid;
+
+  grid$: Observable<Grid>;
+
+  constructor(private fb: FormBuilder) {
+    this.form = new FormGroup({
+      gridSize: new FormControl(25, [Validators.min(0), Validators.max(60)]),
+      period: new FormControl(500, [Validators.min(100), Validators.max(5000)]),
+    });
   }
 
-  init(randomize = false) {
+
+
+  public ngOnInit() {
+    this.form.get('gridSize').valueChanges
+      .pipe(
+        startWith(25),
+      ).subscribe((size: number) => {
+      this.gridSize = size;
+      this.init(true);
+    });
+    this.start();
+  }
+
+  init(randomize = false): Grid {
     this.grid = [];
+    this.generation = 0;
     for (let i = 0; i < this.gridSize; i++) {
       this.grid[i] = [];
       for (let j = 0; j < this.gridSize; j++) {
         this.grid[i][j] = randomize ? this.randomStatus() : 'dead';
       }
     }
+    return this.grid;
   }
 
   randomStatus(): CellStatus {
     return Math.random() > 0.5 ? 'dead' : 'alive';
   }
 
-  randomize() {
-    this.grid = this.grid.map((row) => {
-      return row.map((v) => this.randomStatus());
-    });
+  start() {
+    this.grid$ = this.form.get('period').valueChanges.pipe(
+      startWith(500),
+      switchMap((period) => {
+        return interval(period).pipe(
+          takeWhile(() => !this.pause),
+          tap(() => {
+            this.getNextGrid();
+            this.generation++;
+          }),
+          map(() => this.grid),
+        );
+      })
+    );
   }
 
-  next() {
-    this.grid = this.grid.map((row, i) => {
-      return row.map((cell, j) => {
-        return this.getNextStatus(i, j);
+  getNextGrid() {
+    this.grid.forEach((row, i) => {
+      row.forEach((cell, j) => {
+        this.grid[i][j] = this.getNextStatus(i, j);
       });
     });
   }
@@ -81,5 +121,12 @@ export class AppComponent implements OnInit {
       return 'dead';
     }
     return this.grid[i][j];
+  }
+
+  togglePause() {
+    this.pause = !this.pause;
+    if (!this.pause) {
+      this.start();
+    }
   }
 }

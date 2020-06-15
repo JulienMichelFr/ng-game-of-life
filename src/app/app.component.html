@@ -1,16 +1,24 @@
 <div style="padding: 15px;">
-  <mat-form-field>
-    <input matInput min="0" type="number" placeholder="Grid size" [(ngModel)]="gridSize" (ngModelChange)="init()">
-  </mat-form-field>
+  <form [formGroup]="form" style="display: inline-block;">
+    <mat-form-field>
+      <input matInput min="0" type="number" placeholder="Grid size" formControlName="gridSize">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput min="100" step="100" type="number" placeholder="Interval" formControlName="period">
+      <span matSuffix>ms</span>
+    </mat-form-field>
 
-  <button mat-raised-button color="primary" (click)="next()">NEXT</button>
+  </form>
+
+  <button mat-raised-button color="primary" (click)="getNextGrid()">NEXT</button>
+  <button mat-raised-button color="warn" (click)="togglePause()">PAUSE {{pause}}</button>
   <button mat-raised-button color="warn" (click)="init()">RESET</button>
   <button mat-raised-button color="warn" (click)="init(true)">RESET + randomize</button>
-  <button mat-raised-button color="accent" (click)="randomize()">randomize</button>
+  <span>Generation: {{generation}}</span>
 
 </div>
 <mat-grid-list [cols]="gridSize" rowHeight="1:1" [gutterSize]="0">
-  <ng-container *ngFor="let row of grid; let i = index;">
+  <ng-container *ngFor="let row of (grid$ | async); let i = index;">
     <mat-grid-tile (click)="changeCellStatus(i, j)" *ngFor="let cell of row; let j = index" [ngClass]="cell">
     </mat-grid-tile>
   </ng-container>
