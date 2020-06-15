@@ -7,21 +7,31 @@ import {CellStatus} from './utils/types/cell-status.type';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  public gridSize = 10;
+  public gridSize = 25;
   grid: CellStatus[][];
 
   public ngOnInit() {
     this.init();
   }
 
-  init () {
+  init(randomize = false) {
     this.grid = [];
     for (let i = 0; i < this.gridSize; i++) {
       this.grid[i] = [];
       for (let j = 0; j < this.gridSize; j++) {
-        this.grid[i][j] = 'dead';
+        this.grid[i][j] = randomize ? this.randomStatus() : 'dead';
       }
     }
+  }
+
+  randomStatus(): CellStatus {
+    return Math.random() > 0.5 ? 'dead' : 'alive';
+  }
+
+  randomize() {
+    this.grid = this.grid.map((row) => {
+      return row.map((v) => this.randomStatus());
+    });
   }
 
   next() {

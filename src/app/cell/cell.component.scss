@@ -1,21 +1,14 @@
 :host {
   border: 1px solid black;
   width: 100%;
+  height: 100%;
   text-align: center;
+  flex-grow: 1;
 }
 
-p {
+div {
   height: 100%;
   padding: 0;
   margin: 0;
-  height: 50px;
 }
 
-.dead {
-  background-color: white;
-}
-
-.alive {
-  background-color: black;
-  color: white;
-}

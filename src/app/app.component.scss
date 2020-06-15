@@ -1,5 +1,7 @@
-.row {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-around;
+.dead {
+  background-color: white;
+}
+
+.alive {
+  background-color: black;
 }

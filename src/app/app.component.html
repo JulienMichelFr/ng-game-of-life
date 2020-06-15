@@ -1,10 +1,17 @@
-<div>
-  <div class="row" *ngFor="let row of grid; let i = index;">
-    <ng-container *ngFor="let cell of row; let j = index">
-      <app-cell (click)="changeCellStatus(i, j)" [state]="cell"></app-cell>
-    </ng-container>
-  </div>
-  <input type="number" [(ngModel)]="gridSize" (ngModelChange)="init()">
-  <button (click)="next()">NEXT</button>
-  <button (click)="init()">RESET</button>
+<div style="padding: 15px;">
+  <mat-form-field>
+    <input matInput min="0" type="number" placeholder="Grid size" [(ngModel)]="gridSize" (ngModelChange)="init()">
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" (click)="next()">NEXT</button>
+  <button mat-raised-button color="warn" (click)="init()">RESET</button>
+  <button mat-raised-button color="warn" (click)="init(true)">RESET + randomize</button>
+  <button mat-raised-button color="accent" (click)="randomize()">randomize</button>
+
 </div>
+<mat-grid-list [cols]="gridSize" rowHeight="1:1" [gutterSize]="0">
+  <ng-container *ngFor="let row of grid; let i = index;">
+    <mat-grid-tile (click)="changeCellStatus(i, j)" *ngFor="let cell of row; let j = index" [ngClass]="cell">
+    </mat-grid-tile>
+  </ng-container>
+</mat-grid-list>
