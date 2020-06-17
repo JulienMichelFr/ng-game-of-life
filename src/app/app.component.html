@@ -17,9 +17,6 @@
   <span>Generation: {{generation}}</span>
 
 </div>
-<mat-grid-list [cols]="gridSize" rowHeight="1:1" [gutterSize]="0">
-  <ng-container *ngFor="let row of (grid$ | async); let i = index;">
-    <mat-grid-tile (click)="changeCellStatus(i, j)" *ngFor="let cell of row; let j = index" [ngClass]="cell">
-    </mat-grid-tile>
-  </ng-container>
-</mat-grid-list>
+<div class="center">
+  <canvas #canvas width="1000" height="1000"></canvas>
+</div>

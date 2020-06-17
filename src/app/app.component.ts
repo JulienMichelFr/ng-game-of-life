@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {CellStatus} from './utils/types/cell-status.type';
 import {interval, Observable} from 'rxjs';
 import {map, startWith, switchMap, takeUntil, takeWhile, tap} from 'rxjs/operators';
@@ -13,6 +13,8 @@ type Grid = CellStatus[][];
 })
 export class AppComponent implements OnInit {
 
+  @ViewChild('canvas') canvas: { nativeElement: HTMLCanvasElement };
+
   public form: FormGroup;
 
   public gridSize = 25;
@@ -24,22 +26,22 @@ export class AppComponent implements OnInit {
 
   constructor(private fb: FormBuilder) {
     this.form = new FormGroup({
-      gridSize: new FormControl(25, [Validators.min(0), Validators.max(60)]),
-      period: new FormControl(500, [Validators.min(100), Validators.max(5000)]),
+      gridSize: new FormControl(1000, [Validators.min(0), Validators.max(60)]),
+      period: new FormControl(150, [Validators.min(100), Validators.max(5000)]),
     });
   }
-
 
 
   public ngOnInit() {
     this.form.get('gridSize').valueChanges
       .pipe(
-        startWith(25),
+        startWith(this.form.get('gridSize').value),
       ).subscribe((size: number) => {
       this.gridSize = size;
       this.init(true);
     });
     this.start();
+    this.grid$.subscribe();
   }
 
   init(randomize = false): Grid {
@@ -55,12 +57,12 @@ export class AppComponent implements OnInit {
   }
 
   randomStatus(): CellStatus {
-    return Math.random() > 0.5 ? 'dead' : 'alive';
+    return Math.random() > 0.98 ? 'dead' : 'alive';
   }
 
   start() {
     this.grid$ = this.form.get('period').valueChanges.pipe(
-      startWith(500),
+      startWith(this.form.get('period').value),
       switchMap((period) => {
         return interval(period).pipe(
           takeWhile(() => !this.pause),
@@ -75,11 +77,20 @@ export class AppComponent implements OnInit {
   }
 
   getNextGrid() {
+    console.time('Grid');
+    const ctx = this.canvas.nativeElement.getContext('2d');
+    ctx.clearRect(0, 0, 1000, 1000);
+    const size = 1000 / this.gridSize;
     this.grid.forEach((row, i) => {
       row.forEach((cell, j) => {
-        this.grid[i][j] = this.getNextStatus(i, j);
+        const status = this.getNextStatus(i, j);
+        this.grid[i][j] = status;
+        if (status === 'alive') {
+          ctx.fillRect(i * size, j * size, size, size);
+        }
       });
     });
+    console.timeEnd('Grid');
   }
 
   changeCellStatus(i: number, j: number): void {

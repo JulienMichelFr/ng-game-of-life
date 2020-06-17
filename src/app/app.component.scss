@@ -5,3 +5,13 @@
 .alive {
   background-color: black;
 }
+
+canvas {
+  border: 3px solid red;
+}
+
+.center {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+}
