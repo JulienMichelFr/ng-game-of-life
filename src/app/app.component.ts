@@ -13,7 +13,7 @@ type Grid = CellStatus[][];
 })
 export class AppComponent implements OnInit {
 
-  private form: FormGroup;
+  public form: FormGroup;
 
   public gridSize = 25;
   public generation = 0;
