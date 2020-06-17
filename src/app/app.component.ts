@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
 
   public form: FormGroup;
 
-  public gridSize = 25;
+  public gridSize = 100;
   public generation = 0;
   public pause = false;
   private grid: Grid;
@@ -26,7 +26,7 @@ export class AppComponent implements OnInit {
 
   constructor(private fb: FormBuilder) {
     this.form = new FormGroup({
-      gridSize: new FormControl(1000, [Validators.min(0), Validators.max(60)]),
+      gridSize: new FormControl(100, [Validators.min(0), Validators.max(60)]),
       period: new FormControl(150, [Validators.min(100), Validators.max(5000)]),
     });
   }
@@ -57,7 +57,7 @@ export class AppComponent implements OnInit {
   }
 
   randomStatus(): CellStatus {
-    return Math.random() > 0.98 ? 'dead' : 'alive';
+    return Math.random() > 0.90 ? 'alive' : 'dead';
   }
 
   start() {
